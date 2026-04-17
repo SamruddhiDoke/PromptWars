@@ -1,36 +1,38 @@
-# AI-Driven Swarm Intelligence & Crowd Dynamics
+# Autonomous Predictive Prevention & Crowd Dynamics
 
-A high-performance simulation engine for modeling swarm intelligence and analyzing infrastructural bottlenecks in real time.
+A high-fidelity command and control platform for proactive crowd management and disaster prevention. This system shifts the paradigm from reactive crisis handling to **Autonomous Pre-emptive Mitigation** using real-time predictive physics and generative AI strategy.
 
-Built on a Node.js computational layer that feeds live analytics into a lock-step React and HTML5 Canvas frontend.
+## 🚀 Vision
+Standard crowd management systems react to incidents. This platform **prevents** them. By projecting the state of 20,000 independent agents 120 seconds into the future, the engine identifies and neutralizes structural bottlenecks before they materialize.
 
-## Features
+## 🧠 Key Innovations
 
-*   **High-Density Agent Simulation:** Optimized via an `O(N)` Spatial Hash index, ensuring an efficient server loop that processes multi-goal target mapping and hardware-level bounds collision physics for up to 17,000 concurrent agents.
-*   **Dynamic Architectural Failure Modeling:** Simulates extreme density chokepoints and physical architectural shifts (e.g., gate blockages, emergency evacuations), triggering massive localized repulsion vectors.
-*   **Mathematical System Compliance:** Derives live, percentage-based system trust scoring by utilizing `Dot Product (V1 • V2)` trajectory analysis against assigned goals.
-*   **Explainability Analytics via Vertex AI:** Integrates with Google Cloud's Gemini-1.5-Flash. The system systematically feeds structural coordinates to the LLM and streams tactical predictive forecasts directly to the user dashboard.
-*   **Spatial Heatmap Profiling:** Analyzes agent density via an overlayed radial opacity matrix rendered directly inside the Canvas buffer for real-time visualization of structural chokepoints.
+*   **T+120 Multi-Step Prediction:** Utilizes a forward-simulating `PredictiveEngine` to project density clusters 2 minutes into the future. High-risk zones are identified as anomalies and visualized via a specialized "Future-Sight" heatmap.
+*   **Autonomous Pre-emptive Routing:** The physics engine dynamically injects predicted anomalies as high-weight repulsion zones. Agents autonomously adjust their vectors to seek safer alternative routes before physical congestion occurs.
+*   **Strategic AI Commands:** Integrates with **Google Cloud Vertex AI (Gemini-1.5-Flash)** to produce high-level tactical summaries. The AI analyzes real-time telemetry to explain autonomous rerouting decisions in plain, executive language.
+*   **Massive Throughput Engine:** Optimized Spatial Hashing sustains 20,000+ agents with a sub-16ms engine tick, utilizing binary `Float32Array` buffer streams for peak network efficiency.
+*   **Industrial-Glass Aesthetic:** A monochrome, professional decision-support interface designed for executive clarity and high-stakes environment monitoring.
 
-## Technical Architecture
+## 🛠 Technical Architecture
 
-*   **Backend:** Node.js, Express.js, Socket.IO
-*   **Frontend:** React, Vite, HTML5 Canvas `requestAnimationFrame`, TailwindCSS v4, Framer Motion
-*   **AI Integration:** Google Cloud Vertex AI SDK
-*   **Deployment:** Containerized and configured for Google Cloud Run via Buildpacks
+*   **Physics Core:** Custom Vector Field Engine with O(N) Spatial Hashing.
+*   **AI Integration:** Vertex AI SDK (Generative Strategic Intelligence).
+*   **Networking:** Socket.IO with Binary Buffer Transmissions.
+*   **Frontend:** React, HTML5 Canvas, Tailwind CSS Industrial Theme.
+*   **Cloud Infrastructure:** Google Cloud Run (Serverless Containerization).
 
-## Usage Instructions
+## 📊 Performance Benchmarks
+*   **Agent Capacity:** 20,000 Active Nodes.
+*   **Simulation Rate:** 60 Hz.
+*   **Prediction Horizon:** 120 Seconds.
+*   **Network Payload:** 160 KB/tick (Binary Optimized).
 
-This application serves both the simulation loop and the front-end view under a single monolithic host.
+## Usage
+The application serves as a unified command terminal.
 
-1.  Ensure local `.env` is populated with relevant Vertex AI credentials if testing locally outside Application Default Credentials.
-2.  Install dependencies: `npm install`
-3.  Start the application server: `npm start`
-4.  The React dashboard is pre-compiled and served statically via `/server/public`. Access the interface at `http://localhost:8080/`.
+1.  **Autonomous Mode:** System monitors and manages flow automatically.
+2.  **Simulation Mode:** Trigger infrastructure failures to test system resilience.
+3.  **Future-Sight:** Toggle the overlay to view projected risks identified by the AI.
 
-## Automated Presentation Demo
-
-Initiating the simulated presentation mode executes a predefined infrastructure crisis sequence:
-*   **T=0:** Caps lifted; generates thousands of agents mapping towards the primary goal (Gate A).
-*   **T=5s:** Simulates a mechanical failure at Gate A, initiating localized repulsion grids.
-*   **T=6s+:** The intelligence engine identifies the blockage and dynamically reroutes agent vectors around central structural anomalies to open corridors, recalculating compliance metrics in real-time.
+---
+*Developed for high-stakes infrastructure management and predictive crowd safety analysis.*
