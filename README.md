@@ -2,10 +2,10 @@
 
 A high-fidelity command and control platform for proactive crowd management and disaster prevention. This system shifts the paradigm from reactive crisis handling to **Autonomous Pre-emptive Mitigation** using real-time predictive physics and generative AI strategy.
 
-## 🚀 Vision
+##  Vision
 Standard crowd management systems react to incidents. This platform **prevents** them. By projecting the state of 20,000 independent agents 120 seconds into the future, the engine identifies and neutralizes structural bottlenecks before they materialize.
 
-## 🧠 Key Innovations
+##  Key Innovations
 
 *   **T+120 Multi-Step Prediction:** Utilizes a forward-simulating `PredictiveEngine` to project density clusters 2 minutes into the future. High-risk zones are identified as anomalies and visualized via a specialized "Future-Sight" heatmap.
 *   **Autonomous Pre-emptive Routing:** The physics engine dynamically injects predicted anomalies as high-weight repulsion zones. Agents autonomously adjust their vectors to seek safer alternative routes before physical congestion occurs.
@@ -13,7 +13,7 @@ Standard crowd management systems react to incidents. This platform **prevents**
 *   **Massive Throughput Engine:** Optimized Spatial Hashing sustains 20,000+ agents with a sub-16ms engine tick, utilizing binary `Float32Array` buffer streams for peak network efficiency.
 *   **Industrial-Glass Aesthetic:** A monochrome, professional decision-support interface designed for executive clarity and high-stakes environment monitoring.
 
-## 🛠 Technical Architecture
+## Technical Architecture
 
 *   **Physics Core:** Custom Vector Field Engine with O(N) Spatial Hashing.
 *   **AI Integration:** Vertex AI SDK (Generative Strategic Intelligence).
@@ -21,7 +21,7 @@ Standard crowd management systems react to incidents. This platform **prevents**
 *   **Frontend:** React, HTML5 Canvas, Tailwind CSS Industrial Theme.
 *   **Cloud Infrastructure:** Google Cloud Run (Serverless Containerization).
 
-## 📊 Performance Benchmarks
+## Performance Benchmarks
 *   **Agent Capacity:** 20,000 Active Nodes.
 *   **Simulation Rate:** 60 Hz.
 *   **Prediction Horizon:** 120 Seconds.
