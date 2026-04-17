@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const xss = require('xss-clean');
 const http = require('http');
 const path = require('path');
 const { Server } = require('socket.io');
@@ -17,7 +16,6 @@ app.use(helmet({
     contentSecurityPolicy: false, // Disabling strict CSP to allow WebSockets testing locally
     crossOriginEmbedderPolicy: false
 }));
-app.use(xss()); // Sanitize inputs
 app.use(cors());
 app.use(express.json({ limit: '10kb' })); 
 app.use(express.static(path.join(__dirname, '../public')));
