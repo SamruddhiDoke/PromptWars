@@ -1,177 +1,197 @@
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import CanvasEngine from './CanvasEngine';
-import { Activity, AlertTriangle, Crosshair, Users, Expand, ShieldCheck, PowerOff } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Activity, ShieldAlert, Cpu, Network, Layers, Camera, AlertTriangle } from 'lucide-react';
 
 const socket = io({
   transports: ['websocket'],
 });
 
 const Dashboard = () => {
-  const [agents, setAgents] = useState([]);
-  const [heatmap, setHeatmap] = useState([]);
-  const [showGhosts, setShowGhosts] = useState(false);
-  
-  const [presentationMode, setPresentationMode] = useState(false);
   const [trustScore, setTrustScore] = useState(100);
-  const [decisions, setDecisions] = useState([]);
-  const [envData, setEnvData] = useState({ gates: [], obstacles: [] });
+  const [perfStats, setPerfStats] = useState({ latency: 0, memory: 0, fps: 60, activeAgents: 0 });
+  const [aiStrategy, setAiStrategy] = useState({ summary: "System initializing telemetry...", timestamp: "" });
+  const [showGhosts, setShowGhosts] = useState(false);
+  const [isBlurMode, setIsBlurMode] = useState(false);
+  const [activeScenario, setActiveScenario] = useState('none');
 
   useEffect(() => {
-    socket.on('simulation_state', (data) => setAgents(data));
-    socket.on('predictive_heatmap', (data) => setHeatmap(data));
-    socket.on('presentation_mode', (mode) => setPresentationMode(mode));
-    socket.on('env_data', (data) => setEnvData(data));
-    
     socket.on('intelligence_feed', (data) => {
-        setTrustScore(data.trustScore);
-        setDecisions(prev => {
-            const newLog = [...data.decisions, ...prev];
-            return newLog.slice(0, 8);
-        });
+      setTrustScore(Number(data.trustScore));
+      if(data.performance) setPerfStats(data.performance);
     });
 
-    socket.on('intelligence_feed_alert', (data) => {
-        setDecisions(prev => [data.decision, ...prev].slice(0, 8));
+    socket.on('global_ai_strategy', (data) => {
+      setAiStrategy(data);
     });
 
     return () => {
-      socket.off('simulation_state');
-      socket.off('predictive_heatmap');
-      socket.off('presentation_mode');
-      socket.off('env_data');
       socket.off('intelligence_feed');
-      socket.off('intelligence_feed_alert');
+      socket.off('global_ai_strategy');
     };
   }, []);
 
-  const handlePresentation = () => {
-     socket.emit('start_presentation');
+  const handleScenario = (scenario) => {
+    setActiveScenario(scenario);
+    socket.emit('trigger_scenario', scenario);
   };
-  
-  const handleReset = () => {
-     socket.emit('reset_goals');
-  }
+
+  const resetEnv = () => {
+    setActiveScenario('none');
+    socket.emit('reset_environment');
+    setAiStrategy({ summary: "Environment reset. Waiting for Vertex AI batch...", timestamp: new Date().toLocaleTimeString() });
+  };
+
+  const handleExportPDF = () => {
+     alert("Generating High-Stakes Analytics PDF Report... (Mocked for Demo)");
+  };
 
   return (
-    <div className="min-h-screen bg-cyber-bg p-6 text-gray-200 overflow-hidden font-sans">
-      {/* HEADER */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between mb-8"
-      >
-        <div className="flex items-center gap-4">
-          <Activity className="w-8 h-8 text-cyber-accent" />
-          <h1 className="text-3xl font-bold tracking-wider text-white">AI SWARM <span className="text-cyber-accent">DYNAMICS</span></h1>
-        </div>
-
-        <div className="flex gap-4">
-          <button 
-             onClick={() => setShowGhosts(!showGhosts)}
-             className={`px-4 py-2 rounded font-medium flex items-center gap-2 border transition-all ${
-               showGhosts ? 'bg-cyber-predictive/20 border-cyber-predictive text-white' : 'border-gray-700 hover:border-gray-500'
-             }`}
-          >
-            <Crosshair className="w-4 h-4" />
-            T+5 Predictor
-          </button>
-          
-          <button 
-             onClick={handlePresentation}
-             className="px-6 py-2 rounded font-bold bg-cyber-accent/10 text-cyber-accent border border-cyber-accent shadow-[0_0_15px_#00f0ff] hover:bg-cyber-accent hover:text-black transition-all uppercase tracking-widest flex items-center gap-2"
-          >
-            <Expand className="w-4 h-4" />
-            Start Presentation
-          </button>
-
-          <button 
-             onClick={handleReset}
-             className="px-4 py-2 rounded font-medium bg-gray-800 text-gray-400 border border-gray-600 hover:text-white transition-all uppercase flex items-center gap-2"
-          >
-            <PowerOff className="w-4 h-4" />
-            Reset State
-          </button>
-        </div>
-      </motion.div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-[800px]">
-        {/* LEFT PANEL - STATS */}
-        <div className="col-span-1 flex flex-col gap-6">
-          <motion.div 
-            className="bg-cyber-panel p-6 rounded-lg border border-gray-800/80 shadow-[0_0_20px_rgba(0,0,0,0.5)]"
-            whileHover={{ scale: 1.02 }}
-          >
-            <div className="flex items-center gap-3 mb-4 text-gray-400">
-              <Users className="w-5 h-5 text-cyber-accent" />
-              <h2 className="text-lg uppercase tracking-wide cursor-default">Live Agents</h2>
-            </div>
-            <p className={`text-5xl font-bold transition-colors ${presentationMode && agents.length > 5000 ? 'text-cyber-alert' : 'text-white'}`}>{agents.length}</p>
-            <p className="text-sm mt-2 text-gray-500">Volatile Stream @ ~60 FPS</p>
-          </motion.div>
-          
-          <div className="bg-cyber-panel p-6 rounded-lg border border-gray-800 flex-grow flex flex-col">
-             <div className="flex items-center gap-3 mb-4 text-gray-400">
-                <ShieldCheck className={`w-5 h-5 ${trustScore < 80 ? 'text-cyber-alert' : 'text-green-500'}`} />
-                <h2 className="text-lg uppercase tracking-wide cursor-default">System Trust</h2>
-             </div>
-             
-             <div className="flex items-end gap-2 mb-6">
-                 <p className={`text-5xl font-bold transition-colors ${trustScore < 80 ? 'text-cyber-alert' : 'text-green-400'}`}>
-                     {trustScore}%
-                 </p>
-                 <p className="text-gray-500 pb-1">Compliance Rate</p>
-             </div>
-             
-             <div className="w-full bg-gray-900 rounded-full h-3 mb-8 border border-gray-700">
-                <div 
-                  className={`h-3 rounded-full transition-all duration-1000 ${trustScore < 80 ? 'bg-cyber-alert scale-x-105' : 'bg-green-500'}`} 
-                  style={{ width: `${trustScore}%` }}
-                ></div>
-             </div>
+    <main className="min-h-screen bg-[#0f172a] text-cyan-50 font-sans selection:bg-cyan-500/30">
+      
+      <header className="border-b border-slate-800 bg-[#0f172a]/90 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <ShieldAlert className="w-6 h-6 text-cyan-400" aria-hidden="true" />
+            <h1 className="text-xl font-bold tracking-wider text-slate-200">
+              CRISIS-CORE <span className="text-cyan-500 font-normal">v9.2</span>
+            </h1>
+          </div>
+          <div className="flex gap-4">
+             <button 
+                onClick={handleExportPDF}
+                className="flex items-center gap-2 px-4 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-cyan-400 rounded border border-slate-700 text-sm font-semibold transition-all shadow-[0_0_10px_rgba(34,211,238,0.1)]"
+                aria-label="Export Analytics PDF Report"
+             >
+                <Camera className="w-4 h-4" /> Snapshot Report
+             </button>
           </div>
         </div>
+      </header>
 
-        {/* Viewport Canvas Center */}
-        <div className="col-span-1 lg:col-span-3 h-[800px] relative overflow-hidden rounded-lg">
-          <CanvasEngine agents={agents} heatmap={showGhosts ? heatmap : []} presentationMode={presentationMode} envData={envData} />
-        </div>
+      <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
         
-        {/* RIGHT PANEL - EXPLAINABILITY HUD */}
-        <div className="col-span-1 flex flex-col h-full right-panel-hud">
-           <div className="bg-cyber-panel/90 backdrop-blur-xl p-6 rounded-lg border border-cyber-accent/30 flex-grow overflow-hidden flex flex-col shadow-[0_0_15px_rgba(0,240,255,0.05)]">
-             <div className="flex items-center gap-3 mb-6 text-cyber-accent border-b border-cyber-accent/20 pb-4">
-               <AlertTriangle className="w-5 h-5" />
-               <h2 className="text-lg uppercase tracking-widest font-bold">Explainability</h2>
-             </div>
-             
-             {/* Live Feed Container */}
-             <div className="flex-grow flex flex-col gap-3 overflow-hidden mt-1">
-                <AnimatePresence>
-                    {decisions.map((decision, i) => {
-                        const isCritical = decision.includes('[CRITICAL]');
-                        return (
-                          <motion.div 
-                           key={decision + i}
-                           initial={{ opacity: 0, x: 20 }}
-                           animate={{ opacity: 1, x: 0 }}
-                           className={`p-3 rounded text-sm font-mono border-l-2 bg-gray-900/50 ${
-                             isCritical ? 'border-cyber-alert text-cyber-alert font-bold bg-cyber-alert/10 shadow-[0_0_10px_#ff0055]' : 'border-cyber-accent text-gray-300'
-                           }`}
-                          >
-                              <span className="text-[10px] opacity-70 block mb-1 uppercase tracking-wider">{isCritical ? 'AI_OVERRIDE_LOG' : 'SYS.AI_LOG'}</span>
-                              {decision}
-                          </motion.div>
-                        );
-                    })}
-                </AnimatePresence>
-             </div>
-           </div>
-        </div>
+        {/* Main Canvas Viewport */}
+        <section className="lg:col-span-3 h-[75vh]" aria-label="Crisis Simulation Area">
+           <CanvasEngine showGhosts={showGhosts} isBlurMode={isBlurMode} />
+        </section>
 
+        {/* Global Strategy & Scenario Command Panel */}
+        <aside className="space-y-6" aria-label="System Controls and Metrics">
+          
+          {/* Performance Benchmark Flex Panel */}
+          <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 shadow-2xl">
+            <h2 className="text-xs uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+              <Cpu className="w-4 h-4" /> Hardware Telemetry
+            </h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-slate-800/50 p-3 rounded">
+                <div className="text-xs text-slate-400">Agents</div>
+                <div className="text-lg font-mono text-cyan-300">{perfStats.activeAgents.toLocaleString()}</div>
+              </div>
+              <div className="bg-slate-800/50 p-3 rounded">
+                <div className="text-xs text-slate-400">Engine Tick</div>
+                <div className="text-lg font-mono text-cyan-300">{perfStats.latency}ms</div>
+              </div>
+              <div className="bg-slate-800/50 p-3 rounded">
+                <div className="text-xs text-slate-400">Memory Load</div>
+                <div className="text-lg font-mono text-cyan-300">{perfStats.memory} MB</div>
+              </div>
+              <div className="bg-slate-800/50 p-3 rounded">
+                <div className="text-xs text-slate-400">FPS</div>
+                <div className="text-lg font-mono text-cyan-300">{perfStats.fps}Hz</div>
+              </div>
+            </div>
+          </div>
+
+          {/* System Compliance */}
+          <div className="bg-slate-900 border border-slate-800 rounded-lg p-5">
+            <h2 className="text-xs uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+              <Activity className="w-4 h-4" /> Compliance Rating
+            </h2>
+            <div className="flex items-end gap-3 mb-2">
+              <span className={`text-5xl font-mono ${trustScore < 60 ? 'text-red-400' : 'text-cyan-400'}`}>
+                {trustScore}%
+              </span>
+            </div>
+            <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+               <div 
+                 className={`h-full ${trustScore < 60 ? 'bg-red-500' : 'bg-cyan-500'}`} 
+                 style={{ width: `${trustScore}%`, transition: 'width 0.5s ease-in-out' }}
+                 aria-label="System Trust Progress Bar"
+               />
+            </div>
+          </div>
+
+          {/* Global AI Strategy Panel */}
+          <div className="bg-slate-900 border border-cyan-900/50 rounded-lg p-5 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-2 opacity-10">
+                <Network className="w-24 h-24 text-cyan-500" />
+            </div>
+            <h2 className="text-xs uppercase tracking-widest text-cyan-500 mb-4 flex items-center gap-2 font-bold">
+              <AlertTriangle className="w-4 h-4" /> Vertex AI Strategy
+            </h2>
+            <div className="text-sm font-mono text-slate-300 leading-relaxed min-h-[80px] z-10 relative">
+               {aiStrategy.summary}
+            </div>
+            <div className="text-[10px] text-slate-500 mt-4 font-mono z-10 relative">
+               LAST SYNC: {aiStrategy.timestamp || "PENDING"}
+            </div>
+          </div>
+
+          {/* Scenario Command Matrix */}
+          <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 shadow-2xl">
+            <h2 className="text-xs uppercase tracking-widest text-slate-400 mb-4">Command Matrix</h2>
+            
+            <div className="space-y-2 mb-6">
+                <button 
+                  onClick={() => handleScenario('fire_drill')}
+                  className={`w-full text-left px-4 py-2 text-sm rounded border transition-colors ${activeScenario === 'fire_drill' ? 'bg-cyan-900/40 border-cyan-500 text-cyan-100' : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-500'}`}
+                >
+                  <span className="text-xs text-slate-500 mr-2">[01]</span> Station Fire Drill
+                </button>
+                <button 
+                  onClick={() => handleScenario('gate_failure')}
+                  className={`w-full text-left px-4 py-2 text-sm rounded border transition-colors ${activeScenario === 'gate_failure' ? 'bg-cyan-900/40 border-cyan-500 text-cyan-100' : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-500'}`}
+                >
+                  <span className="text-xs text-slate-500 mr-2">[02]</span> Gate Malfunction
+                </button>
+                <button 
+                  onClick={() => handleScenario('terror_threat')}
+                  className={`w-full text-left px-4 py-2 text-sm rounded border transition-colors ${activeScenario === 'terror_threat' ? 'bg-red-900/40 border-red-500 text-red-100' : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-500'}`}
+                >
+                  <span className="text-xs text-slate-500 mr-2">[03]</span> Terror Threat Level High
+                </button>
+            </div>
+
+            <h2 className="text-xs uppercase tracking-widest text-slate-400 mb-3">IoT Overlays</h2>
+            <div className="flex gap-2 mb-6">
+                <button 
+                  onClick={() => setShowGhosts(!showGhosts)}
+                  className={`flex-1 py-1.5 rounded text-xs font-semibold border ${showGhosts ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' : 'bg-slate-800 text-slate-400 border-slate-700'}`}
+                >
+                  {showGhosts ? 'T+5 ACTIVE' : 'T+5 GHOSTS'}
+                </button>
+                <button 
+                  onClick={() => setIsBlurMode(!isBlurMode)}
+                  className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded text-xs font-semibold border ${isBlurMode ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50' : 'bg-slate-800 text-slate-400 border-slate-700'}`}
+                >
+                  <Layers className="w-3 h-3" /> BLUR MAP
+                </button>
+            </div>
+
+            <button 
+              onClick={resetEnv}
+              className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-sm font-semibold transition-colors uppercase tracking-widest"
+              aria-label="Reset Security Environment"
+            >
+              Reset Physics Engine
+            </button>
+          </div>
+
+        </aside>
       </div>
-    </div>
+    </main>
   );
 };
 
